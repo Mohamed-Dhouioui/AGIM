@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Abatement Technologies</title>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-md navbar-light  fixed-top bg-light">
+            <a class="navbar-brand" href="#">Abatement Technologies</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown active">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Room1
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" data-target="#achSetModal" data-toggle="modal" href="#achSetModal">ACH Setup</a>
+                            <a class="dropdown-item" href="calibration.html">Calbration</a>
+                            <a class="dropdown-item" data-target="#roomSetup" data-toggle="modal" href="#roomSetup">Room Setup</a>
+                        </div>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#">Room2 </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">ACH</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#">Profile 1 </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Profile 2</a>
+                            <a class="dropdown-item" href="#">Profile 3</a>
+                            <a class="dropdown-item" href="#">Profile 4</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#"></a>
+                    </li>
+                </ul>
+                <form class="form-inline mt-2 mt-md-0">
+                    <div class="dropdown dropleft">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown"><i class="fas fa-cog" aria-hidden="true"></i></button>
+                        <div class="dropdown-menu">
+                            <h5 class="dropdown-header">SETTINGS</h5>
+                            <a class="dropdown-item" data-target="#displayModal" data-toggle="modal">DISPLAY</a>
+                            <a class="dropdown-item" data-target="#soundsModal" data-toggle="modal">SOUNDS</a>
+                            <a class="dropdown-item" data-target="#dateModal" data-toggle="modal">TIME/DATE</a>
+                            <a class="dropdown-item" data-target="#featuresModal" data-toggle="modal">FEATURES</a>
+                            <a class="dropdown-item" href="data.html">DATA</a>
+                            <a class="dropdown-item" data-target="#BACnetModal" href="#">COMM</a>
+                            <a class="dropdown-item" href="password.html">PASSWORD</a>
+                            <a class="dropdown-item" data-target="#systemModal" data-toggle="modal">SYSTEM</a>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-light "><i class="fa fa-wifi" aria-hidden="true"></i></button>
+                </form>
+            </div>
+        </nav>
+    </header>
+    <br><br><br>
+    <div class="container">
+        <h5 class="text-center">ISO-ROOM</h5>
+        <div class="row">
+            <div>
+                <button id="updateButton" class="btn btn-primary updateButton" style="display: none;">Update</button>
+            </div>
+        </div>
+        <br>
+        <div class="row text-center">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-light btn-circle btn-xl" data-toggle="modal" data-target="#pressureMod"><i class=""><span id="tempVal"><small>PRESSURE 1.1 kPa</small></span></i></button>
+            </div>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-light btn-circle btn-xl" data-toggle="modal" data-target="#achModal"><i class=""><span id="humVal"><SMALL>ACH 14</SMALL></span></i></button>
+            </div>
+        </div>
+        <!-- SYSTEM Modal -->
+        <div class="modal fade" id="systemModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">SYSTEM INFORMATION</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>DEVICE NAME:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <label>NAMExxxx</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>SERIAL NUMBER:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Axxxxxxxxxx</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>FIRMWARE:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Axxxxxxxxxx</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success  " id="">CLONE SETUP</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Featuers Modal -->
+        <div class="modal fade" id="featuresModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">FEATUERS ENABLE DISABLE</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>PRESSURE</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-success">ENABLE</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary" id="">DISABLE</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>ACH</label>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success">ENABLE</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary">DISABLE</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>TEMPURATURE</label>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success" id="">ENABLE</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary" id="">DISABLE</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>HUMIDITY</label>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success  ">ENABLE</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary  " id="">DISABLE</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>PARTICLES</label>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success ">ENABLE</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary  " id="">DISABLE</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- sound Modal -->
+        <div class="modal fade" id="soundsModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">SOUND SETTINGS</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>ALARM</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-success  " id="" data-toggle="modal" data-target="#unlockModal">ON</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary  " id="">OFF</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>TOUCH BEEP</label>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success  " id="" data-toggle="modal" data-target="#unlockModal">ON</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary  " id="">OFF</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- display Modal -->
+        <div class="modal fade" id="displayModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">DISPLAY SETTINGS</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label>SCREEN SLEEP</label>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-success  " id="" data-toggle="modal" data-target="#unlockModal">ON</button>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary  " id="">OFF</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">SCRENN TIME OUT:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">30 Sec.</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">AUTO LOCK:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">30 Sec.</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- dateModal Modal -->
+        <div class="modal fade" id="dateModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">TIME/DATE SETTINGS</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group ">
+                            <div class="col-sm-3 ">
+                                <label for="">SET TIME/DATE</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <input class="form-control" type="datetime-local" value="2011-08-19T13:45:00" id="example-datetime-local-input">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- The Modal -->
+        <div class="modal fade" id="pressureMod">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title text-center">PRESSURE ALARM POINTS</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <h4 class="text-center"> ROOM TYPE</h4>
+                        <div class="row text-center">
+                            <div class="col-sm-6"><button type="button" class="btn btn-outline-success btn-lg" id="posBtn"> POSITIVE</button></div>
+                            <div class="col-sm-6"><button type="button" class="btn btn-outline-danger btn-lg" id="negBtn"> NEGATIVE</button></div>
+                        </div>
+                        <br>
+                        <div id="posDiv" style="display:none">
+                            <div class="row text-center">
+                                <div class="col-sm-3 ">
+                                    LOW ALARM
+                                </div>
+                                <div class="col-sm-3 ">
+                                    LOW WARNING
+                                </div>
+                                <div class="col-sm-3 ">
+                                    HIGH WARNING
+                                </div>
+                                <div class="col-sm-3 ">
+                                    HIGH ALARM
+                                </div>
+                            </div>
+                            <div class="row form-group" id="demo">
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-danger text-white" value="15Pa">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-warning text-white" value="17Pa">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-warning text-white" value="22Pa">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-danger text-white" value="25Pa">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="negDiv" style="display:none">
+                            <div class="row text-center">
+                                <div class="col-sm-3 ">
+                                    LOW ALARM
+                                </div>
+                                <div class="col-sm-3 ">
+                                    LOW WARNING
+                                </div>
+                                <div class="col-sm-3 ">
+                                    HIGH WARNING
+                                </div>
+                                <div class="col-sm-3 ">
+                                    HIGH ALARM
+                                </div>
+                            </div>
+                            <div class="row form-group" id="negative">
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control  bg-danger text-white" value="-15Pa">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-warning text-white" value="-12Pa">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-warning text-white" value="-8.5Pa">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-danger text-white" value="-7.5Pa">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                                <label>PRESSURE ALARM:</label>
+                            </div>
+                            <div class="col-sm-3 custom-control custom-switch pl-5">
+                                <input type="checkbox" class="custom-control-input" id="pressureSwitch" name="example">
+                                <label class="custom-control-label" for="pressureSwitch"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-6 offset-md-3">
+                <button type="button" class="btn btn-danger btn-circle btn-l"><i class="fas fa-bell"></i></button>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-light btn-circle btn-l"><i class=""><span id=""><SMALL>PPM 250</SMALL></span></i></button>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-light btn-circle btn-l" data-toggle="modal" data-target="#rhModal"><i class=""><span id=""><SMALL>RH 21%</SMALL></span></i></button>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-light btn-circle btn-l" data-toggle="modal" data-target="#tempModal"><SMALL>TEMP 25.0</SMALL></span></i></button>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-light btn-circle btn-l"><i class=""><span id=""><SMALL>PARTICLES 396</SMALL></span></i></button>
+            </div>
+        </div>
+        <!-- The Modal Temperature-->
+        <div class="modal fade" id="tempModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="text-center">TEMPERATURE ALARM POINTS </h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <h4 class="text-center"> </h4>
+                        <div>
+                            <div class="row text-center">
+                                <div class="col-sm-3 ">
+                                    LOW ALARM
+                                </div>
+                                <div class="col-sm-3 ">
+                                    LOW WARNING
+                                </div>
+                                <div class="col-sm-3 ">
+                                    HIGH WARNING
+                                </div>
+                                <div class="col-sm-3 ">
+                                    HIGH ALARM
+                                </div>
+                            </div>
+                            <div class="row " id="demo">
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-danger text-white" value="19 &#8451;">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-warning text-white" value="22 &#8451;">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-warning text-white" value="26 &#8451;">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <input type="text" class="form-control bg-danger text-white" value="29 &#8451;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- PASSWORD MODAL-->
+        <div class="modal fade" id="passwordModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="text-center">PASSWORD SETTINGS </h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal"><i class="fa fa-lock" aria-hidden="true"></i></button>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">ISO-ROOM</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Room Profile</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">Room Profile</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- The ROOM SETUP-->
+        <div class="modal fade" id="roomSetup">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="text-center">ROOM TYPE/NAME </h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Room Name:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">ISO-ROOM</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Room Profile</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">Room Profile</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Color:</label>
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <select class="form-control" id="colorSelect">
+                                    <option value="">Select Color:</option>
+                                    <option value="#000000" style="background-color: Black;color: #FFFFFF;">Black</option>
+                                    <option value="#808080" style="background-color: Gray;">Gray</option>
+                                    <option value="#A9A9A9" style="background-color: DarkGray;">DarkGray</option>
+                                    <option value="#D3D3D3" style="background-color: LightGrey;">LightGray</option>
+                                    <option value="#FFFFFF" style="background-color: White;">White</option>
+                                    <option value="#7FFFD4" style="background-color: Aquamarine;">Aquamarine</option>
+                                    <option value="#0000FF" style="background-color: Blue;">Blue</option>
+                                    <option value="#000080" style="background-color: Navy;color: #FFFFFF;">Navy</option>
+                                    <option value="#800080" style="background-color: Purple;color: #FFFFFF;">Purple</option>
+                                    <option value="#FF1493" style="background-color: DeepPink;">DeepPink</option>
+                                    <option value="#EE82EE" style="background-color: Violet;">Violet</option>
+                                    <option value="#FFC0CB" style="background-color: Pink;">Pink</option>
+                                    <option value="#006400" style="background-color: DarkGreen;color: #FFFFFF;">DarkGreen</option>
+                                    <option value="#008000" style="background-color: Green;color: #FFFFFF;">Green</option>
+                                    <option value="#9ACD32" style="background-color: YellowGreen;">YellowGreen</option>
+                                    <option value="#FFFF00" style="background-color: Yellow;">Yellow</option>
+                                    <option value="#FFA500" style="background-color: Orange;">Orange</option>
+                                    <option value="#FF0000" style="background-color: Red;">Red</option>
+                                    <option value="#A52A2A" style="background-color: Brown;">Brown</option>
+                                    <option value="#DEB887" style="background-color: BurlyWood;">BurlyWood</option>
+                                    <option value="#F5F5DC" style="background-color: Beige;">Beige</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <label for="email">Color</label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- The Modal ACH SETUP-->
+        <div class="modal fade" id="achSetModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="text-center">ACH SETUP </h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Room Volume:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Duct Type:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Width:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">Height:</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- The Modal ACH -->
+        <div class="modal fade" id="achModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="text-center">ACH ALARM POINTS </h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <h4 class="text-center"> </h4>
+                        <div class="row text-center">
+                            <div class="col-sm-3 ">
+                                LOW ALARM
+                            </div>
+                            <div class="col-sm-3 ">
+                                LOW WARNING
+                            </div>
+                            <div class="col-sm-3 ">
+                                HIGH WARNING
+                            </div>
+                            <div class="col-sm-3 ">
+                                HIGH ALARM
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-danger text-white" value="12">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-warning text-white" value="14">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-warning text-white" value="20">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-danger text-white" value="25">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                                <label>ACH ALARM:</label>
+                            </div>
+                            <div class="col-sm-3 custom-control custom-switch pl-5">
+                                <input type="checkbox" class="custom-control-input" id="achSwitch" name="example">
+                                <label class="custom-control-label" for="achSwitch"></label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">DELAY ALARM:</label>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control text-white" value="">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                                <label for="ach">AIRFLOW UNIT:</label>
+                            </div>
+                            <div class="col-sm-4 btn-group">
+                                <button type="button" class="btn btn-primary" id="achMetric" value="Metric">Metric</button>
+                                <button type="button" class="btn btn-secondary" id="achIMP" value="">IMPERAL (CFM)</button>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- RH Modal  -->
+        <div class="modal fade" id="rhModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="text-center">HUMIDITY ALARM POINTS </h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <h4 class="text-center"> </h4>
+                        <div class="row text-center">
+                            <div class="col-sm-3 ">
+                                LOW ALARM
+                            </div>
+                            <div class="col-sm-3 ">
+                                LOW WARNING
+                            </div>
+                            <div class="col-sm-3 ">
+                                HIGH WARNING
+                            </div>
+                            <div class="col-sm-3 ">
+                                HIGH ALARM
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-danger text-white" value="40%">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-warning text-white" value="45%">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-warning text-white" value="55%">
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text" class="form-control bg-danger text-white" value="60%">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                                <label>HUMIDITY ALARM:</label>
+                            </div>
+                            <div class="col-sm-3 custom-control custom-switch pl-5">
+                                <input type="checkbox" class="custom-control-input" id="switch2" name="example">
+                                <label class="custom-control-label" for="switch2"></label>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3 ">
+                                <label for="email">DELAY ALARM:</label>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control text-white" value="">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-3">
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="hideNegPos" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--   ================================================== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="css/custom.css">
+    <script>
+        $(document).ready(function() {
+
+            $("#posBtn").click(function() {
+                $("#negDiv").hide(500);
+                $("#posDiv").show(600);
+            });
+            $("#negBtn").click(function() {
+                $("#posDiv").hide(500);
+                $("#negDiv").show(600);
+            });
+
+            $("#hideNegPos, .close").click(function() {
+                $("#posDiv").hide();
+                $("#negDiv").hide();
+            });
+
+            $("#achMetric").click(function() {
+                $("#achMetric").removeClass("btn-secondary");
+                $(this).addClass("btn-primary");
+                $("#achIMP").removeClass("btn-primary");
+                $("#achIMP").addClass("btn-secondary");
+            });
+            $("#achIMP").click(function() {
+                $("#achIMP").removeClass("btn-secondary");
+                $(this).addClass("btn-primary");
+                $("#achMetric").removeClass("btn-primary");
+                $("#achMetric").addClass("btn-secondary");
+            });
+        });
+
+    </script>
+</body>
+
+</html>

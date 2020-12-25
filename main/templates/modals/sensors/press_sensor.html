@@ -1,0 +1,29 @@
+{% extends 'modal_base.html' %}
+{% block modal_content %}
+<input type="hidden" id="id_negative_room" name="negative_room"></input>
+<div class="row text-center text-nowrap">
+  <div class="col-sm-6"><button type="button" class="btn-sm btn-outline-success btn" id="posBtn" onclick="showPressRoom('positive');"> POSITIVE</button></div>
+  <div class="col-sm-6"><button type="button" class="btn-sm btn-outline-danger btn" id="negBtn" onclick="showPressRoom('negative');"> NEGATIVE</button></div>
+</div>
+<div>
+  <br>
+  <div id="pressPositiveValues" style="">
+    {% include "modals/sensors/sensor_tresholds.html" with low_alarm=form.low_alarm low_warn=form.low_warning high_warn=form.high_warning high_alarm=form.high_alarm %}
+  </div>
+  <div id="pressNegativeValues" style="display: none">
+    {% include "modals/sensors/sensor_tresholds.html" with low_alarm=form.low_alarm_neg low_warn=form.low_warning_neg high_warn=form.high_warning_neg high_alarm=form.high_alarm_neg %}
+  </div> 
+{% include "modals/sensors/sensor_active.html" with title="PRESSURE" active=form.alarm_active_press %}
+{% include "modals/sensors/alarm_delay.html" %}
+</div>
+<div class="row">
+   <div class="col-sm-3 small text-nowrap">
+      <label for="ach">PRESSURE UNIT:</label>
+   </div>
+   <div class="col-sm-4 btn-group">
+      <input type="hidden" id="id_in_h2o" name="in_h2o"></input>
+      <button type="button" class="btn-sm btn-primary" id="pressInh2o" value="Celsius" onclick="genericToggleUnit(true, 'press', 'in_h2o', '#pressInh2o', '#pressPascal');">In H2O</button>
+      <button type="button" class="btn-sm btn-secondary" id="pressPascal" value="" onclick="genericToggleUnit(false, 'press', 'in_h2o', '#pressInh2o', '#pressPascal');">Pascal</button>
+   </div>
+</div>
+{% endblock %}

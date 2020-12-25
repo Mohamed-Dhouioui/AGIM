@@ -1,0 +1,10 @@
+pytest
+ipython
+ipdb
+mock
+pytest-cov
+django
+jinja2
+selenium
+django-widget-tweaks
+pyvirtualdisplay

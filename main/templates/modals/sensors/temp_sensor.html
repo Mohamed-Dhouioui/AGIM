@@ -1,0 +1,16 @@
+{% extends 'modal_base.html' %}
+{% block modal_content %}
+{% include "modals/sensors/sensor_tresholds.html" with low_alarm=form.low_alarm low_warn=form.low_warning high_warn=form.high_warning high_alarm=form.high_alarm %}
+{% include "modals/sensors/sensor_active.html" with title="TEMPERATURE" active=form.alarm_active_temp %}
+{% include "modals/sensors/alarm_delay.html" %}
+<div class="row">
+   <div class="col-sm-3 small ">
+      <label for="ach">TEMPERATURE UNIT:</label>
+   </div>
+   <div class="col-sm-4 btn-group">
+      <input type="hidden" id="id_celsius" name="celsius"></input>
+      <button type="button" class="btn-sm btn-primary" id="tempCelsius" value="Celsius" onclick="genericToggleUnit(true, 'temp', 'celsius', '#tempCelsius', '#tempFahrenheit');">Celsius</button>
+      <button type="button" class="btn-sm btn-secondary" id="tempFahrenheit" value="" onclick="genericToggleUnit(false, 'temp', 'celsius', '#tempCelsius', '#tempFahrenheit');">Fahrenheit</button>
+   </div>
+</div>
+{% endblock %}

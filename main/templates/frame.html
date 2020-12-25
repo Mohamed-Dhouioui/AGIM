@@ -1,0 +1,33 @@
+{% load static %}
+<!-- This frame is necessary to log into the database for all sub pages -->
+<script>
+    var log_interval = Number("{{ log_seconds }}") * 1000;
+
+    // store sensor measurement every log_seconds seconds
+    if (log_interval != 0) {
+        window.setInterval(function() {
+            logSensors();
+        }, 10000);
+    }
+
+    // read, then store sensor measurements via get request
+    function logSensors() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "log_sensors" %}',
+            success: function(data) {}
+        });
+    }
+
+</script>
+<!-- content -->
+{% if view_type == "main" %}
+{% include "navigation.html" %}
+<br><br><br>
+{% include "room.html" %}
+{% elif view_type == "data" %}
+{% include "data.html" %}
+{% elif view_type == "password" %}
+{% include "password.html" %}
+{% endif %}
+<!-- /content -->

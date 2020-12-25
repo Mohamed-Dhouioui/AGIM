@@ -1,0 +1,6 @@
+{% extends 'modal_base.html' %}
+{% block modal_content %}
+{% include "modals/sensors/sensor_tresholds.html" with low_alarm=form.low_alarm low_warn=form.low_warning high_warn=form.high_warning high_alarm=form.high_alarm %}
+{% include "modals/sensors/sensor_active.html" with title="HUMIDITY" active=form.alarm_active_hum %}
+{% include "modals/sensors/alarm_delay.html" %}
+{% endblock %}

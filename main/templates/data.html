@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block device_script %}
+<script>
+// Change log interval from combobox onchange
+function changeLogInterval() { 
+    document.getElementById('log_interval_form').submit();
+}
+
+// Change display type from combobox onchange
+function changeDisplayType() { 
+    document.getElementById('display_type_form').submit();
+}
+
+// Data needs to be stored in the DB here as well
+function storeData(){
+  $.ajax({
+      type: "GET",
+      url: '{% url "store_data" %}',
+      success: function(data){
+      },
+  });   
+} 
+</script>
+{% endblock %}
+{% block content %}
+<h1>Data</h1>
+<a href='/' class='btn btn-primary btn-lg'>Back</a>
+<a href='{% url "erase_data" %}' class='btn btn-danger btn-lg'>Erase History</a>
+<a href='{% url "view_data" %}' class='btn btn-lg'>Reload</a>
+  <button type="button" class="edit_btn btn btn-primary" onclick="storeData();">Download to USB</button>
+
+<form id="log_interval_form" method="post" action="/main/change_log_interval">{% csrf_token %}
+Interval:
+<select id="id_log_interval" name="log_interval" onchange="changeLogInterval()">
+      {% for interval in log_intervals %}
+      {% if forloop.counter0 == config.log_interval %}
+       <option value="{{forloop.counter0}}" selected> {{interval}}</option>
+       {% else %}
+       <option value="{{forloop.counter0}}"> {{interval}}</option>
+       {% endif %}
+       {% endfor %}
+</select>
+</form>
+
+<form id="display_type_form" method="post" action="/main/change_display_type">{% csrf_token %}
+Display:
+<select id="id_display_type" name="display_type" onchange="changeDisplayType()">
+      {% for dtype in display_types %}
+      {% if forloop.counter0 == config.display_type %}
+       <option value="{{forloop.counter0}}" selected> {{dtype}}</option>
+       {% else %}
+       <option value="{{forloop.counter0}}"> {{dtype}}</option>
+       {% endif %}
+       {% endfor %}
+</select>
+</form>
+
+<div class="card">
+<div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>
+            Date
+          </th>
+          <th>
+            Temperature
+          </th>
+          <th>
+            Humidity
+          </th>
+          <th>
+            Pressure
+          </th>
+          <th>
+            Airflow
+          </th>
+          <th>
+            Analog
+          </th>
+          <th>
+            Particles
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for measurement in measurements %}
+                <tr>
+                <td class="py-1">{{ measurement.timestamp|date:'Y-m-d G:i' }}</td>
+                <td>{{ measurement.temperature }}</td>
+                <td>{{ measurement.humidity }}</td>
+                <td>{{ measurement.pressure }}</td>
+                <td>{{ measurement.airflow }}</td>
+                <td>{{ measurement.analog }}</td>
+                <td>{{ measurement.particles }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+
+{% endblock %}

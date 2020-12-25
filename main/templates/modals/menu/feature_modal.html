@@ -1,0 +1,20 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+   {% with 'pressure airflow temperature humidity particles' as list %}
+     {% for sensor in list.split %}
+         <div class="row form-group">
+            <input type="hidden" id="id_{{sensor}}" name="{{sensor}}"></input>
+            <div class="col-sm-3 ">
+               <label>{{sensor|upper}}</label>
+            </div>
+            <div class="col-sm-3">
+               <button type="button" class="btn btn-success" id="{{sensor}}Enable" onclick="toggleModalParameter('features', '{{sensor}}', true);">ENABLE</button>
+            </div>
+            <div class="col-sm-3 ">
+               <button type="button" class="btn btn-secondary" id="{{sensor}}Disable" onclick="toggleModalParameter('features', '{{sensor}}', false);">DISABLE</button>
+            </div>
+         </div>
+     {% endfor %}
+   {% endwith %}
+{% endblock %}

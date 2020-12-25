@@ -1,0 +1,57 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+
+
+<!-- For Modal Header -->
+<p class="text-center">Air Velocity Sensor </p>
+<p class="text-center text-danger"> <small>WARNING: BEFORE CALBRATING THE SENSOR, TURN OFF ALL AIRFLOW IN THE DUCT </small></p>
+<div class="row form-group text-center">
+    <div class="col-sm-6 ">
+        <button type="button" class="btn btn-primary btn-sm" id="calibrateBtn" onclick="calibrateAch();"> Calibrate </button>
+        <!-- i need a different function here that updates the modal as well -->
+    </div>
+    <div class="col-sm-6">
+        <button type="button" class="btn btn-primary btn-sm" id="kFactor" onclick="showKFactor();"> K-Factor </button>
+    </div>
+</div>
+
+<div id="kFactorDiv" style="display:none">
+    <div class="row form-group">
+        <div class="col-sm-3 ">
+            <label for="">Sensor Reading:</label>
+
+        </div>
+        <div class="col-sm-3">
+            {{achcalibration_form.reading|add_class:"form-control"}}
+        </div>
+        <div class="col-sm-6 ">
+            <label for=""><small>CFM Or M^3/H Depends on main page air flow unit </small></label>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-sm-3 ">
+            <label for="">K-Factor:</label>
+
+        </div>
+        <div class="col-sm-3">
+            {{achcalibration_form.k_factor|add_class:"form-control"}}
+        </div>
+        <div class="col-sm-1 ">
+            <label for="">%</label>
+        </div>
+    </div>
+
+    <!--     <div class="row form-group">
+                                <div class="col-sm-3 ">
+                                    <label for="">Calculated CFM Or M^3/H:</label>
+
+                                </div>
+
+                                <div class="col-sm-3 ">
+                                    {{achcalibration_form.cfm|add_class:"form-control"}}
+                                </div>
+                            </div> -->
+</div>
+{% endblock %}

@@ -1,0 +1,704 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Abatement Technologies</title>
+
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/jquery.css' %}">
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'bootstrap/js/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="{% static 'keyboard/docs/js/jquery-migrate-3.1.0.min.js' %}"></script>
+    <link href="{% static 'keyboard/css/keyboard.css' %}" rel="stylesheet">
+    <script src="{% static 'keyboard/js/jquery.keyboard.js' %}"></script>
+
+    <script src="{% static 'keyboard/js/jquery.mousewheel.js' %}"></script>
+    <script src="{% static 'keyboard/js/jquery.keyboard.extension-typing.js' %}"></script>
+    <script src="{% static 'keyboard/js/jquery.keyboard.extension-autocomplete.js' %}"></script>
+    <script src="{% static 'keyboard/js/jquery.keyboard.extension-caret.js' %}"></script>
+
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/a076d05399.js' %}"></script>
+
+    <script type="text/javascript">
+        var metric_conversion = 1.6990108200000058; // obsolete?
+        var metric_conversion2 = 16387.1;
+
+
+        var COLOR_NAMES = ['Gray', 'DarkGray', 'Blue', 'Navy', 'DarkGreen',
+            'Green', 'Yellow', 'Orange', 'Red'
+        ]
+
+        // Map color index to hex color
+        var COLOR_MAP = ["#808080", "#A9A9A9", "#3C4874", "#000080", "#006400",
+            "#008000", "#FFFF00", "#FFA500", "#FF0000"
+        ]
+
+        // These colors are considered as bright
+        var BRIGHT_COLORS = ["#808080", "#FFFFFF", "#FFFF00", "#FFA500"]
+
+        var menu_types = ['network', 'features', 'display', 'clock', 'sound', 'profile',
+            'achsetup', 'achcalibration'
+        ];
+
+        var menu_collectors = [gatherNetworkData, gatherFeaturesData, gatherDisplayData,
+            gatherClockData, gatherSoundData, gatherProfileData, gatherAchsetupData,
+            gatherAchcalibrationData
+        ];
+
+        window.onload = function() {
+
+            setTimeout(function() {
+                document.body.style.opacity = "100";
+            }, 500);
+            if ($('.profileVal').text() == 'Profile 1') {
+                $('.profileVal').text('OCCUPIED POSITIVE');
+            }
+            if ($('.profileVal').text() == 'Profile 2') {
+                $('.profileVal').text('OCCUPIED NEGATIVE');
+            }
+            if ($('.profileVal').text() == 'Profile 3') {
+                $('.profileVal').text('SURGERY');
+            }
+            if ($('.profileVal').text() == 'Profile 4') {
+                $('.profileVal').text('NEED CLEANING');
+            }
+            if ($('.profileVal').text() == 'Profile 5') {
+                $('.profileVal').text('UNOCCUPIED');
+            }
+            // we prolly don't need these tags?
+            // Attach on screen keyboard
+            // var availableTags = ["ActionScript", "AppleScript", "Asp", "BASIC", "C", "C++", "Clojure",
+            // "COBOL", "ColdFusion", "Erlang", "Fortran", "Groovy", "Haskell", "Java", "JavaScript",
+            // "Lisp", "Perl", "PHP", "Python", "Ruby", "Scala", "Scheme"
+            //  ];
+            var availableTags = [""];
+            $('.pressSensor, .genSensor')
+                .keyboard({
+                    layout: 'num',
+                    restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
+                    preventPaste: true, // prevent ctrl-v and right click
+                    autoAccept: true
+                })
+                .addTyping();
+
+            $('input[type=text]')
+                .keyboard({
+                    layout: 'qwerty'
+                })
+                .autocomplete({
+                    source: availableTags
+                })
+                // position options added after v1.23.4
+                .addAutocomplete({
+                    position: {
+                        of: null, // when null, element will default to kb.$keyboard
+                        my: 'right top', // 'center top', (position under keyboard)
+                        at: 'left top', // 'center bottom',
+                        collision: 'flip'
+                    }
+                })
+                .addTyping();
+            // /Attach on screen keyboard
+
+        };
+
+        var was_touched = false;
+
+        var do_lock_screen = false;
+
+        var lock_time = Number("{{ lock_time }}") * 1000;
+
+        var refreshIntervalId = null;
+
+        // Run lockScreen every lock_time seconds if locking is active (lock_time != 0)
+        if (lock_time != 0) {
+            refreshIntervalId = window.setInterval(function() {
+                setLockActive(true);
+            }, lock_time);
+        }
+
+        function setLockActive(first_run) {
+            if (lock_time != 0) {
+                if (window.was_touched == true || first_run == true) {
+                    window.was_touched = false; // only show popup after next touch!
+                    window.do_lock_screen = true;
+                    clearInterval(refreshIntervalId);
+                }
+            }
+        }
+
+        // If the password was entered correctly, close the lock screen modal
+        function submitPassword() {
+            clearInterval(refreshIntervalId);
+            $.ajax({
+                type: 'POST',
+                url: '{% url "verify_password" %}',
+                dataType: "json",
+                data: {
+                    "password": document.getElementById('password_input').value,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(data) {
+                    $('#checkPasswordModal').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                    window.was_touched = false;
+                    window.do_lock_screen = false;
+                    window.password_check = false;
+                    refreshIntervalId = window.setInterval(function() {
+                        setLockActive(false);
+                    }, lock_time);
+                },
+            });
+        }
+        $("#confiPress").click(function() {
+            $(".progress-bar").css({
+                "width": "0%"
+            });
+            //$("#pressureCaliDone").addClass("d-none");
+        });
+        // Generic POST function to handle sensors as well as config modals
+        function genericPOST(url, data) {
+            if ($('#configurePressurecalibrationModal').is(':visible')) {
+                $(".progress-bar").css({
+                    "width": "100%",
+                    "transition": "2s"
+                });
+            }
+            $.ajax({
+                url: url, // the endpoint
+                type: "POST", // http method
+                data: data, // data sent via POST
+
+                // hide the modal on success
+                success: function(json) {
+                    //$(".progress-bar").css({"width": "100%","transition": "3s"});
+                    if ($('#configurePressurecalibrationModal').is(':visible')) {
+                        setTimeout(function() {
+                            $('.configure-pressurecalibration-modal').modal('hide');
+                        }, 4500);
+                        setTimeout(function() {
+                            $("#pressureCaliDone").removeClass("d-none");
+                        }, 3000);
+                        setTimeout(function() {
+                            $("#pressureCaliDone").addClass("d-none");
+                        }, 4300);
+                    } else {
+                        $('.my-modal').modal('hide');
+                    }
+                    //setTimeout(function() {$(".alert").alert('close');}, 6000);
+                },
+            });
+        };
+
+        function touchAlarm() {
+            $.ajax({
+                type: "GET",
+                url: '{% url "touch_alarm" %}',
+            });
+        }
+
+        $('body').click(function(e) {
+            touchAlarm();
+
+            window.was_touched = true;
+            if (window.do_lock_screen == false) {
+                clearInterval(refreshIntervalId);
+                refreshIntervalId = window.setInterval(function() {
+                    setLockActive(false);
+                }, lock_time);
+            } else {
+                // Open non-closable modal which asks for the password
+                e.stopPropagation();
+                e.preventDefault();
+                $('.my-modal').modal('hide');
+                $("#checkPasswordModal").modal({
+                    backdrop: "static"
+                });
+                clearInterval(refreshIntervalId);
+                return false;
+            }
+        })
+
+        // MENU MODAL JS -> move into file!
+
+        // Update network configuration via GET
+        function configureNetwork() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_network_json" %}',
+                success: function(data) {
+                    $(".configure-network #id_name").val(data.name);
+                    $(".configure-network #id_password").val(data.password);
+                },
+            });
+        }
+
+        // Update sound configuration via GET
+        function configureSound() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_sound_json" %}',
+                success: function(data) {
+                    toggleModalParameter('sound', 'alarm', data.alarm);
+                    toggleModalParameter('sound', 'touch', data.touch);
+                },
+            });
+        }
+
+        // Update active features configuration via GET
+        function configureFeatures() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_features_json" %}',
+                success: function(data) {
+                    toggleModalParameter('features', 'pressure', data.press);
+                    toggleModalParameter('features', 'temperature', data.temp);
+                    toggleModalParameter('features', 'humidity', data.hum);
+                    toggleModalParameter('features', 'particles', data.part);
+                    toggleModalParameter('features', 'airflow', data.flow);
+                },
+            });
+        }
+
+        // Update display configuration via GET
+        function configureDisplay() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_display_json" %}',
+                success: function(data) {
+                    toggleModalParameter('display', 'screen_sleep', data.screen_sleep);
+                    $(".configure-display #id_off_time").val(data.off_time);
+                    $(".configure-display #id_lock_time").val(data.lock_time);
+                },
+            });
+        }
+
+        // Change the current profile
+        function toggleProfile(index) {
+            let url = '{% url "toggle_profile" 99999 %}';
+            url = url.replace('99999', index);
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function(data) {
+                    setProfileModal(data.title, data.color, data.profile_index, data.room_index)
+                    changeLayout();
+                    toggleProfileLayout(index);
+                    if ($('.profileVal').text() == 'Profile 1') {
+                        $('.profileVal').text('OCCUPIED POSITIVE');
+                    }
+                    if ($('.profileVal').text() == 'Profile 2') {
+                        $('.profileVal').text('OCCUPIED NEGATIVE');
+                    }
+                    if ($('.profileVal').text() == 'Profile 3') {
+                        $('.profileVal').text('SURGERY');
+                    }
+                    if ($('.profileVal').text() == 'Profile 4') {
+                        $('.profileVal').text('NEED CLEANING');
+                    }
+                    if ($('.profileVal').text() == 'Profile 5') {
+                        $('.profileVal').text('UNOCCUPIED');
+                    }
+                },
+            });
+        }
+
+        function toggleProfileLayout(index) {
+            $("#dropdownMenuLink").text('Profile ' + index);
+
+            var i;
+            for (i = 1; i <= 5; i++) {
+                $('#profile_link_' + i).attr('style', 'display: block !important');
+            }
+
+            $('#profile_link_' + index).attr('style', 'display: none !important');
+        }
+
+        // toggle room without redirect also needs to alter the room number
+        // the room number variable should be renamed and stored in base
+        function setProfileModal(title, color, profile_index, room_index) {
+            $(".configure-profile #id_title").val(title);
+            $(".configure-profile #profile_title").text(title);
+            $(".configure-profile #id_color").val(color).change();
+            var color_string = $(".configure-profile #id_color option:selected").text();
+            $(".configure-profile #profile_color").text(color_string);
+            $(".configure-profile #profile_index_label").text(profile_index);
+            $(".configure-profile #id_number").val(room_index);
+        }
+
+        // Toggle any modal button layout and the connected hidden input
+        function toggleModalParameter(menu_type, feature, state) {
+            if (state == true) {
+                toggleButtonLayout("#" + feature + 'Enable', "#" + feature + 'Disable', 'btn-success');
+            } else {
+                toggleButtonLayout("#" + feature + 'Disable', "#" + feature + 'Enable', 'btn-success');
+            }
+            $('.configure-' + menu_type + ' #id_' + feature).val(state);
+        }
+
+        // could be fused with toggleModalParameter
+        function toggleAchsetup(state) {
+            if (state == true) {
+                toggleButtonLayout("#roundEnable", "#roundDisable", "btn-primary", "btn btn-secondary");
+                $('#squareDiv').css('display', 'none');
+                $('#roundDiv').css('display', 'block');
+            } else {
+                toggleButtonLayout("#roundDisable", "#roundEnable", "btn-primary", "btn btn-secondary");
+                $('#squareDiv').css('display', 'block');
+                $('#roundDiv').css('display', 'none');
+            }
+            $('.configure-achsetup #id_round').val(state);
+        }
+
+        // Toggle the layout of two buttons for button activation
+        function toggleButtonLayout(btnOnId, btnOffId, onType = "btn-primary", offType = "btn-secondary") {
+            $(btnOnId).removeClass(offType);
+            $(btnOnId).addClass(onType);
+            $(btnOffId).removeClass(onType);
+            $(btnOffId).addClass(offType);
+        }
+
+        // Actually, this could be generic as well: pass a list of ids to request
+        // "name": $('#id_name').val(), works as well
+        // (and a second list for checkboxes). Could be merged with sensor modals then.
+        function gatherNetworkData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                name: $('#id_name').val(),
+                password: $(' #id_password').val(),
+            }
+
+            return data;
+        }
+
+        function gatherDisplayData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                screen_sleep: $('#id_screen_sleep').val(),
+                off_time: $('#id_off_time').val(),
+                lock_time: $(' #id_lock_time').val(),
+            }
+
+            return data;
+        }
+
+        function gatherClockData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                now: $('#id_now').val(),
+            }
+
+            return data;
+        }
+
+        function gatherSoundData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                alarm: $('#id_alarm').val(),
+                touch: $('#id_touch').val(),
+            }
+
+            return data;
+        }
+
+        function gatherAchsetupData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                volume: $('#id_volume').val(),
+                round: $('#id_round').val(),
+                diameter: $('#id_diameter').val(),
+                width: $('#id_width').val(),
+                height: $('#id_height').val(),
+            }
+
+            return data;
+        }
+
+        function gatherAchcalibrationData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                k_factor: $('#id_k_factor').val(),
+            }
+
+            return data;
+        }
+
+        function showKFactor() {
+            $('#kFactorDiv').css("display", "block");
+        }
+
+        // Find out which features are activated and display sensor buttons accordingly
+        function gatherFeaturesData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                pressure: $('#id_pressure').val(),
+                temperature: $('#id_temperature').val(),
+                humidity: $('#id_humidity').val(),
+                particles: $('#id_particles').val(),
+                airflow: $('#id_airflow').val(),
+            }
+
+            showButtons(data['pressure'], data['temperature'], data['humidity'],
+                data['particles'], data['airflow'], );
+
+            return data;
+        }
+
+        // Set buttons either visible or invisible, depending on features
+        function showButtons(pressure, temperature, humidity, particles, airflow) {
+            if (pressure.toLowerCase() == "true") {
+                $('#pressBtn').css("visibility", "visible");
+            } else {
+                $('#pressBtn').css("visibility", "hidden");
+            }
+            if (temperature.toLowerCase() == "true") {
+                $('#tempBtn').css("visibility", "visible");
+            } else {
+                $('#tempBtn').css("visibility", "hidden");
+            }
+            if (humidity.toLowerCase() == "true") {
+                $('#humBtn').css("visibility", "visible");
+            } else {
+                $('#humBtn').css("visibility", "hidden");
+            }
+            if (particles.toLowerCase() == "true") {
+                $('#partBtn').css("visibility", "visible");
+            } else {
+                $('#partBtn').css("visibility", "hidden");
+            }
+            if (airflow.toLowerCase() == "true") {
+                $('#flowBtn').css("visibility", "visible");
+            } else {
+                $('#flowBtn').css("visibility", "hidden");
+            }
+        }
+
+        function gatherProfileData() {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                title: $('#id_title').val(),
+                room_index: $('#id_number').val(),
+                profile_index: $('#profile_index_label').text(),
+                color: $('#id_color').val(),
+            }
+            changeLayout();
+            toggleProfileLayout($('#profile_index_label').text());
+
+            return data;
+        }
+
+        // Set profile setup modal fields
+        function configureProfileSetup() {
+            var room_index = $(".configure-profile #id_number").val();
+            var profile_index = $("#profile_index").val();
+
+            let url = '{% url "get_profile_json" 99999 88888 %}';
+            url = url.replace('99999', room_index);
+            url = url.replace('88888', profile_index);
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function(data) {
+                    setProfileModal(data.title, data.color, profile_index, room_index);
+                },
+            });
+        }
+
+        function configureAchsetup() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_achsetup_json"  %}',
+                success: function(data) {
+                    setAchsetupModal(data.volume, data.square, data.diameter, data.width, data.height);
+                },
+            });
+        }
+
+        function calibrateAch() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "set_flow_average"  %}',
+                success: function(data) {
+                    configureAchCalibration();
+                },
+            });
+        }
+
+        function configureAchCalibration() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_achcalibration_json"  %}',
+                success: function(data) {
+                    $(".configure-achcalibration #id_k_factor").val(data.k_factor);
+                    $(".configure-achcalibration #id_average").val(data.average);
+
+                    var sensor_data = $("#airflow").text();
+                    $(".configure-achcalibration #id_reading").val(sensor_data);
+                    // setSensorReading(sensor_data, data.average, data.duct, data.is_metric);
+                    setCFM(sensor_data, data.average, data.duct, data.k_factor, data.is_metric);
+                },
+            });
+        }
+
+        // M^3/H={[(AVGREAD-REF) *0.015] ×RDUCT or SDUCT}*Kfactor/100
+        // Could be fused with setSensorReading
+        function setCFM(sensor_data, average, duct, k_factor, is_metric) {
+            //var result = ((sensor_data - average) * 0.015) * duct * k_factor / 100;
+            var result = ((sensor_data - average) * 0.013634) * duct * k_factor * 60;
+            if (is_metric == false) {
+                result = result / metric_conversion2;
+            }
+            $(".configure-achcalibration #id_cfm").val(result.toFixed(16));
+        }
+
+        // OBSOLETE
+        // Prolly i can spare the hidden average and call this function after calibration was pressed
+        // M^3/H={[(AVGREAD-REF) *0.015]×RDUCT or SDUCT} 
+        function setSensorReading(sensor_data, average, duct, is_metric) {
+            var result = ((sensor_data - average) * 0.015) * duct;
+            if (is_metric == false) {
+                result = result * metric_conversion;
+            }
+            $(".configure-achcalibration #id_reading").val(result.toFixed(2));
+        }
+
+
+        function setAchsetupModal(volume, square, diameter, width, height) {
+            toggleAchsetup(!square);
+            $(".configure-achsetup #id_volume").val(volume);
+            $(".configure-achsetup #id_diameter").val(diameter);
+            $(".configure-achsetup #id_width").val(width);
+            $(".configure-achsetup #id_height").val(height);
+        }
+
+        // Change the actual room without redirect
+        function toggleRoom(index) {
+            setRoomActive(index);
+
+            let url = '{% url "toggle_room" 99999 %}';
+            url = url.replace('99999', index);
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function(data) {
+                    // all these three are called in another function as well, can they be fused?
+                    setProfileModal(data.title, data.color, data.profile_index, data.room_index)
+                    changeLayout();
+                    toggleProfileLayout(data.profile_index);
+                },
+            });
+        }
+
+        // Change the layout of the room links according to which room is active
+        function setRoomActive(room) {
+            var opposite = '2';
+
+            if (room == '2') {
+                opposite = '1';
+            }
+            if (room == '2') {
+                $(".WT").addClass("whiteText");
+            }
+            $('#menu_room_' + room).css('display', 'block');
+            $('#menu_room_' + opposite).css('display', 'none');
+
+            $('#link_room_' + opposite).css('display', 'block');
+            $('#link_room_' + room).css('display', 'none');
+        }
+
+        // Change the color layout of the main page
+        function changeLayout() {
+            $("#page_title").text($('#id_title').val());
+
+            var color_string = $(".configure-profile #id_color option:selected").text();
+            var color_index = COLOR_NAMES.indexOf(color_string);
+            var color_hex = COLOR_MAP[color_index];
+            var text_color_hex = '#FFFFFF';
+            if (BRIGHT_COLORS.indexOf(color_hex) >= 0) {
+                text_color_hex = '#000000';
+            }
+
+            $("#dropdownMenuLink").css('color', text_color_hex);
+            $("#navbarDropdown").css('color', text_color_hex);
+            $(".navbar").css('background-color', color_hex);
+        }
+
+        // This is not nice
+        function setProfileTitle() {
+            $("#profile_title").text($("#id_title").val())
+        }
+
+        // Duplicate, also in configureProfileSetup
+        function setProfileColor() {
+            var color_string = $(".configure-profile #id_color option:selected").text();
+            $("#profile_color").text(color_string);
+        }
+
+        function attachSubmitHandler(name, url, collectorFct) {
+            $('#' + name + 'Form').on('submit', function(event) {
+                event.preventDefault();
+                genericPOST(url, collectorFct(name));
+            });
+        }
+
+        $(document).ready(function() {
+            // Attach POST submits to all menu modals
+            for (var i = 0; i < menu_types.length; i++) {
+                attachSubmitHandler(menu_types[i], "/main/update_" + menu_types[i], menu_collectors[i]);
+            }
+
+            // Set initial visibility of sensor buttons
+            showButtons("{{config.features.pressure}}", "{{config.features.temperature}}",
+                "{{config.features.humidity}}", "{{config.features.particles}}",
+                "{{config.features.airflow}}", );
+
+            // set initial profile setup modal parameters
+            setProfileModal("{{config.active_profile.title}}",
+                "{{config.active_profile.color}}",
+                "{{config.active_profile.profile_index}}",
+                "{{config.active_profile.room_index}}")
+
+            setRoomActive("{{config.active_profile.room_index}}");
+
+            // these two functions should be fused to a generic setSiteLayout (maybe with setRoomActive as well)
+            changeLayout();
+            toggleProfileLayout("{{config.active_profile.profile_index}}");
+        });
+        // /MENU MODAL JS
+
+    </script>
+    {% block device_script %}{% endblock %}
+</head>
+
+<body>
+    <!-- menu modals -->
+    {% include "modals/password_modal.html" %}
+    {% include "modals/menu/achcalibration_modal.html" with name="achcalibration" header="ACH CALIBRATION" form=achcalibration_form hidden="average" %}
+    {% include "modals/menu/achsetup_modal.html" with name="achsetup" header="ACH SETUP" form=achsetup_form hidden="round" %}
+    {% include "modals/menu/pressurecalibration_modal.html" with name="pressurecalibration" header="PRESSURE CALIBRATION" form=pressurecalibration_form hidden="nothing" %}
+    {% include "modals/menu/system_modal.html" with name="system" header="SYSTEM INFORMATION" hidden="nothing" %}
+    {% include "modals/menu/comm_modal.html" with name="comm" header="BACNET SETTINGS" hidden="nothing" %}
+    {% include "modals/menu/network_modal.html" with name="network" header="NETWORK SETTINGS" form=network_form hidden="nothing" %}
+    {% include "modals/menu/feature_modal.html" with name="features" header="FEATURES ENABLE DISABLE" form=features_form hidden="nothing" %}
+    {% include "modals/menu/display_modal.html" with name="display" header="DISPLAY SETTINGS" form=display_form hidden="screen_sleep" %}
+    {% include "modals/menu/clock_modal.html" with name="clock" header="TIME/DATE SETTINGS" form=clock_form  hidden="nothing" %}
+    {% include "modals/menu/profile_modal.html" with name="profile" header="PROFILE SETTINGS" form=profile_form hidden="number" %}
+    {% include "modals/menu/sound_modal.html" with name="sound" header="SOUND SETTINGS" form=sound_form hidden="nothing" %}
+    <!-- /menu modals -->
+    {% block content %}{% endblock %}
+</body>
+
+</html>

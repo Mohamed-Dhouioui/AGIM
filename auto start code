@@ -1,0 +1,9 @@
+sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart or /home/pi/.config/autostart/autoAGIM.desktop
+$ sudo chmod u+x /home/pi/AGIM/Desktop/start.sh
+tr -d "\r" <start.sh> startx.sh   "to make sure if there was wrong newline"
+sudo chmod +x start.sh
+/home/pi/AGIM/Desktop/start.sh
+@xset s off
+@xset s noblank
+@lxterminal - -command “/home/pi/Desktop/AGIM/start.sh” 
+dwc_otg.lpm_enable=0 console=tty3 root=/dev/mmcblk0p7 rootfstype=ext4 elevator=deadline rootwait fbcon=map:10 fbcon=font:ProFont6x11 loglevel=3 logo.nologo

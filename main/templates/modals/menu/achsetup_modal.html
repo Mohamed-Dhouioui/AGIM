@@ -1,0 +1,51 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+    
+          
+<div class="row form-group">
+	<div class="col-sm-4 text-nowrap">
+		<label for="">Room Volume:</label>
+	</div>
+	<div class="col-sm-4">
+            {{achsetup_form.volume|add_class:"form-control"}}
+      </div>
+</div>
+<div class="row form-group">
+	<div class="col-sm-4 text-nowrap">
+		<label for="">Duct Type:</label>
+	</div>
+	<div class="col-sm-4 btn-group">
+		<button type="button" class="btn-sm btn-primary " id="roundEnable" onclick="toggleAchsetup(true);">ROUND</button>
+		<button type="button" class="btn-sm btn-secondary " id="roundDisable" onclick="toggleAchsetup(false);">SQUARE</button>
+	</div>
+
+</div>
+<div id="roundDiv" style="display:none">
+	<div class="row form-group" >
+		<div class="col-sm-4 text-nowrap">
+			<label for="">Diameter:</label>
+		</div>
+		<div class="col-sm-4">
+                {{achsetup_form.diameter|add_class:"form-control"}}
+        </div>
+	</div>
+</div>
+<div id="squareDiv" style="display:none">
+	<div class="row form-group" >
+		<div class="col-sm-3 ">
+			<label for="">Width:</label>
+		</div>
+		<div class="col-sm-3">
+             {{achsetup_form.width|add_class:"form-control"}}
+        </div>
+
+		<div class="col-sm-3 ">
+			<label for="">Height:</label>
+		</div>
+		<div class="col-sm-3">
+             {{achsetup_form.height|add_class:"form-control"}}
+         </div>
+	</div>
+</div>
+{% endblock %}

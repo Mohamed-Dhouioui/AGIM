@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/pi/Desktop/AGIM/start.sh
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=AutoAGIM
+Name=AutoAGIM
+Comment=Start AGIM when GNOME starts

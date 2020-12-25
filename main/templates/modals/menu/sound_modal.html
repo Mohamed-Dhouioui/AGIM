@@ -1,0 +1,20 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+   {% with 'alarm touch' as list %}
+     {% for toggle_type in list.split %}
+         <div class="row form-group">
+            <input type="hidden" id="id_{{toggle_type}}" name="{{toggle_type}}"></input>
+            <div class="col-sm-3 ">
+               <label>{{toggle_type|upper}}</label>
+            </div>
+            <div class="col-sm-3">
+               <button type="button" class="btn btn-success" id="{{toggle_type}}Enable" onclick="toggleModalParameter('sound', '{{toggle_type}}', true);">ENABLE</button>
+            </div>
+            <div class="col-sm-3 ">
+               <button type="button" class="btn btn-secondary" id="{{toggle_type}}Disable" onclick="toggleModalParameter('sound', '{{toggle_type}}', false);">DISABLE</button>
+            </div>
+         </div>
+     {% endfor %}
+   {% endwith %}
+{% endblock %}

@@ -1,0 +1,13 @@
+body {
+    opacity: 0;
+    line-height: 1.5;
+}
+
+.navbar-brand {
+    padding-bottom: 1.3125rem !important;
+}
+
+.ui-keyboard {
+    left: 19% !important;
+    top: auto !important;
+}

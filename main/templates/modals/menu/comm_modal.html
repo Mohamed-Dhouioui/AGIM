@@ -1,0 +1,48 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+    <div class="row form-group">
+       <div class="col-sm-3 ">
+          <label>BACNET STATUS</label>
+       </div>
+       <div class="col-sm-3 ">
+          <button type="button" class="btn btn-success" id="bacnet_statusEnable" onclick="toggleModalParameter('comm', 'bacnet_status', true);">ENABLE</button>
+       </div>
+       <div class="col-sm-3 ">
+          <button type="button" class="btn btn-secondary" id="bacnet_statusDisable" onclick="toggleModalParameter('comm', 'bacnet_status', false);">DISABLE</button>
+       </div>
+    </div>
+    <div class="row form-group">
+       <div class="col-sm-3 ">
+          <label for="email">BAUDRATE:</label>
+       </div>
+       <div class="col-sm-3">
+          {{comm_form.baudrate|add_class:"form-control"}}
+       </div>
+       <div class="col-sm-3 ">
+          <label for="email">{{ config.comm.baudrate }} ..</label>
+       </div>
+    </div>
+    <div class="row form-group">
+       <div class="col-sm-3 ">
+          <label for="email">MAC ADRESS:</label>
+       </div>
+       <div class="col-sm-3">
+          {{comm_form.mac_adress|add_class:"form-control"}}
+       </div>
+       <div class="col-sm-3 ">
+          <label for="email">{{ config.comm.mac_adress }} Sec.</label>
+       </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-sm-3 ">
+           <label for="email">OBJECT INSTANCE:</label>
+        </div>
+        <div class="col-sm-3">
+           {{comm_form.object_instance|add_class:"form-control"}}
+        </div>
+        <div class="col-sm-3 ">
+           <label for="email">{{ config.comm.object_instance }} Sec.</label>
+        </div>
+     </div>
+{% endblock %}

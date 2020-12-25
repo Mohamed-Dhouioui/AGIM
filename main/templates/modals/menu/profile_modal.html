@@ -1,0 +1,46 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+<div class="row ">
+    <div class="col-sm-4 ">
+        <label for="email">Room Name:</label>
+    </div>
+    <div class="col-sm-4">
+
+        {{profile_form.title|add_class:"form-control"}}
+    </div>
+    <div class="col-sm-4" id="">Room 1</div>
+</div>
+<div class="row ">
+    <div class="col-sm-4 ">
+        <label for="email">Profile Name:</label>
+    </div>
+    <div class="col-sm-4">
+        {{profile_form.title|add_class:"form-control"}}
+    </div>
+    <div class="col-sm-4" id="profile_title">Titel</div>
+</div>
+
+<div class="row ">
+    <div class="col-sm-4 ">
+        <label for="email">Profile</label>
+    </div>
+    <div class="col-sm-4">
+        <select id="profile_index" class="form-control" name="profile_index" onchange="configureProfileSetup();">
+            {% for index in '12345'|make_list %}
+            <option value="{{index}}">{{index}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-sm-4" id="profile_index_label">1</div>
+</div>
+<div class="row ">
+    <div class="col-sm-4 ">
+        <label for="email">Color:</label>
+    </div>
+    <div class="col-sm-4 ">
+        {{profile_form.color|add_class:"form-control"}}
+    </div>
+    <div class="col-sm-4" id="profile_color">Color</div>
+</div>
+{% endblock %}

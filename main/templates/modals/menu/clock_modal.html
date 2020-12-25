@@ -1,0 +1,12 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+  <div class="row form-group">
+     <div class="col-sm-3 ">
+        <label for="email">SET TIME/DATE</label>
+     </div>
+     <div class="col-sm-6">
+        {{clock_form.now|add_class:"form-control"}}
+     </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,681 @@
+{% extends 'base.html' %}
+{% block device_script %}
+<script>
+    var alarm_surpressed = []; // keeps track which sensors are surpressed via alarm buttons
+    var running_alarm = [];
+    var sensor_types = ["press", "temp", "flow", "hum", "part"];
+    var full_names = ["pressure", "temperature", "airflow", "humidity", "particles"];
+    var unit_types = [" in H2O", " °C", "", " %", ""];
+
+    var refresh_interval = 2000; // refresh data display every 5 seconds
+
+    // Update sensor values every refresh_interval seconds
+    window.setInterval(function() {
+        if ($('#configureAchcalibrationModal').is(':visible')) {} else {
+            getSensorData();
+        }
+        if ($('#configureAchsetupModal').is(':visible')) {} else {
+            configureAchsetup();
+        }
+
+    }, refresh_interval);
+
+    // Delete a running Alarm
+    function deleteAlarm() {
+        clearInterval(alarmDelayID);
+        alarmDelayID = null;
+        alarmOff();
+    }
+
+    var alarmDelayID = null;
+
+    // Make an alarm run in delay seconds
+    function setAlarm(delay) {
+        if (!alarmDelayID) {
+            alarmDelayID = window.setInterval(function() {
+                alarmOn();
+            }, delay * 1000);
+        }
+    }
+
+    // Start an alarm with given delay
+    function startAlarm(delay) {
+        if (delay == null || delay == 0) {
+            deleteAlarm();
+            alarmOn();
+        } else {
+            setAlarm(delay);
+        }
+        return true;
+    }
+
+    // Check if triggering an alarm is necessary depending on the sensor value and type
+    function triggerAlarm(sensor_read, sensor_type, sensor) {
+        var sensorBtn = '#' + sensor_type + 'Btn';
+        var [low_alarm, low_warning, high_warning, high_alarm] = [sensor.low_alarm, sensor.low_warning, sensor.high_warning, sensor.high_alarm];
+
+        if (sensor_type == "press" && sensor.negative == "true") {
+            sensor_read = sensor_read * -1;
+            low_alarm = sensor.low_alarm_neg * -1;
+            low_warning = sensor.low_warning_neg * -1;
+            high_warning = sensor.high_warning_neg * -1;
+            high_alarm = sensor.high_alarm_neg * -1;
+        }
+
+        // Check if an alarm treshold was surpassed and the sensor is active; 
+        // color alarm button yellow for warning or green if the other conditions don't apply
+        if ((sensor_read < parseFloat(low_alarm)) || (sensor_read > parseFloat(high_alarm))) {
+            $(sensorBtn).css("border-color", "red");
+
+            if (sensor.active == "true" && alarm_surpressed.includes(sensor_type) == false) {
+                $("#alarmBtn").css("visibility", "visible");
+                startAlarm(sensor.delay);
+
+                // prevent double inclusion
+                if (running_alarm.includes(sensor_type) == false) {
+                    running_alarm.push(sensor_type);
+                }
+                return true;
+            }
+            return false; // only the border color changed, no alarm is fired
+        } else if ((sensor_read < parseFloat(low_warning)) || (sensor_read > parseFloat(high_warning))) {
+            $(sensorBtn).css("border-color", "yellow");
+        } else {
+            $(sensorBtn).css("border-color", "#449d44");
+        }
+
+        deleteFromArray(sensor_type, alarm_surpressed);
+        deleteFromArray(sensor_type, running_alarm);
+
+        return false;
+    }
+
+    function deleteFromArray(sensor_type, the_array) {
+        var index = the_array.indexOf(sensor_type);
+        if (index > -1) {
+            the_array.splice(index, 1);
+        }
+    }
+
+    // convert units for temp, flow and pressure sensors
+    function convertUnit(sensor, unit) {
+        // not too pretty, better to check for sensor_type explicitly
+        if (sensor.metric == "false") {
+            sensor.value = toCFM(sensor.value);
+        }
+        if (sensor.celsius == "false") {
+            sensor.value = toFahrenheit(sensor.value);
+            unit = " F";
+        }
+        if (sensor.in_h2o == "false") {
+            sensor.value = toPascal(sensor.value);
+            unit = " Pa";
+        }
+
+        return sensor, unit;
+    }
+
+    // Set a sensors value and run triggerAlarm to see if an alarm is necessary
+    function setSensor(index, sensor) {
+        // BUG: PROBABLY THIS IS CALLED WITH A BAD INDEX SOMETIMES !?!
+        // console.log("room - setSensor");
+        // console.log(index);
+        //console.log(sensor);
+        //console.log(sensor.value);
+        // console.log(full_names[index]);
+        var textfield = document.getElementById(full_names[index]);
+        var alarm = false;
+
+        if (textfield != null && sensor.value != "false") {
+            var unit = unit_types[index];
+
+            sensor, unit = convertUnit(sensor, unit);
+
+            // active needs to be passed since the border coloring is independent of the actual alarm triggering
+            alarm = triggerAlarm(sensor.value, sensor_types[index], sensor);
+
+            // display negative value for pressure sensor if necessary
+            if (sensor.negative == "true") {
+                textfield.textContent = '-' + sensor.value + unit;
+            } else {
+                textfield.textContent = sensor.value + unit;
+            }
+        }
+
+        return alarm;
+    }
+
+
+    // Read the sensor data for the active room number and set all sensor buttons
+    // to their sensor data
+    // fuse this with configureSensor somehow
+    function getSensorData() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "get_sensors" %}',
+            success: function(data) {
+                var press_alarm = setSensor(0, data.press);
+                var temp_alarm = setSensor(1, data.temp);
+                if (data.flow.value > 0) {
+                    var flow_alarm = setSensor(2, data.flow);
+                }
+                var hum_alarm = setSensor(3, data.hum);
+                var part_alarm = setSensor(4, data.part);
+                //$("#CFMval").text(JSON.stringify(data.flow.value));
+                var analog = document.getElementById("analog");
+                if (analog != null) {
+                    analog.textContent = data.analog.value;
+                }
+
+                if ((temp_alarm == false) && (hum_alarm == false) && (press_alarm == false) && (flow_alarm == false) && (part_alarm == false)) {
+                    // If no alarm was fired, hide the alarm button and delete running alarm
+                    $("#alarmBtn").css("visibility", "hidden");
+                    deleteAlarm();
+                }
+            },
+        });
+    }
+    //Test
+    function configureAchsetup() {
+        $.ajax({
+            type: 'GET',
+            url: '{% url "get_achsetup_json"  %}',
+            success: function(data) {
+                setAchsetupModal(data.volume, data.square, data.diameter, data.width, data.height);
+                //var x = (JSON.stringify($('#CFMval span').text()));
+                $("#CFMval").text(JSON.stringify(Math.round($('#airflow').text(), 2) * data.volume * 35.3147) / 60);
+
+            },
+        });
+    }
+
+    //Test End    
+    // Set the treshold values for a sensor modal
+    function setTresholds(modalClass, sensor_type, low_alarm, low_warn, high_warn, high_alarm, neg_suffix = '', neg_sign = '') {
+        var unit = unit_types[sensor_types.indexOf(sensor_type)];
+
+        if (sensor_type == 'temp' && $('#id_celsius').val() == "false") {
+            unit = " F";
+        }
+        if (sensor_type == 'press' && $('#id_in_h2o').val() == "false") {
+            unit = " Pa";
+        }
+
+        $(modalClass + " #id_low_alarm" + neg_suffix).val(neg_sign + low_alarm); //+ unit
+        $(modalClass + " #id_low_warning" + neg_suffix).val(neg_sign + low_warn); //+ unit
+        $(modalClass + " #id_high_warning" + neg_suffix).val(neg_sign + high_warn); //+ unit
+        $(modalClass + " #id_high_alarm" + neg_suffix).val(neg_sign + high_alarm); //+ unit
+    }
+
+    // Toggle the unit type for temp, press and flow
+    // (required for submitting the form; if the form is not submitted, this is undone)
+    function genericToggleUnit(do_toggle, name, input, button1, button2) {
+        if (do_toggle == false) {
+            $('.configure-' + name + ' #id_' + input).val("false");
+            toggleButtonLayout(button2, button1);
+
+        } else {
+            $('.configure-' + name + ' #id_' + input).val("true");
+            toggleButtonLayout(button1, button2);
+        }
+    }
+
+
+    // Hide both pressure room treshold inputs and set room type
+    function configurePressureSensor(modalClass, data) {
+        // $("#pressPositiveValues").hide();
+        $("#pressNegativeValues").hide();
+        $(modalClass + ' #id_negative_room').val(data.negative);
+    }
+
+    // Retrieve sensor configuration based on room and type and set the modal inputs accordingly
+    function configureSensor(sensor_type) {
+        var modalClass = ".configure-" + sensor_type;
+
+        $.ajax({
+            type: 'GET',
+            url: '{% url "get_sensors" %}',
+            success: function(data) {
+                $(modalClass + " #id_sensor_type").val(sensor_type);
+
+                var tmp = data[sensor_type]; // only the data of this sensor type matters
+
+                // Set tresholds, also negative tresholds for pressure sensor
+                setTresholds(modalClass, sensor_type, tmp.low_alarm, tmp.low_warning, tmp.high_warning, tmp.high_alarm)
+                if (sensor_type == "press") {
+                    setTresholds(modalClass, sensor_type, tmp.low_alarm_neg, tmp.low_warning_neg, tmp.high_warning_neg, tmp.high_alarm_neg, '_neg', '- ')
+                }
+
+                // Set delay values and sensor active checkboxes
+                $(modalClass + ' #id_alarm_active_' + sensor_type).prop("checked", (tmp.active == 'true'));
+                $(modalClass + ' #id_delay').val(tmp.delay);
+
+                if (sensor_type == "flow") {
+                    genericToggleUnit(tmp.metric == 'true', 'flow', 'metric', '#achMetric', '#achIMP');
+                }
+                if (sensor_type == "temp") {
+                    genericToggleUnit(tmp.celsius == 'true', 'temp', 'celsius', '#tempCelsius', '#tempFahrenheit');
+                }
+                if (sensor_type == "press") {
+                    genericToggleUnit(tmp.in_h2o == 'true', 'press', 'in_h2o', '#pressInh2o', '#pressPascal');
+                    configurePressureSensor(modalClass, tmp);
+                }
+            },
+        });
+    }
+
+    // Convert a value to CFM, metric = m³/h, CFM = cubic feet per minute
+    function toCFM(value) {
+        return Math.round(value * 0.5886);
+    }
+
+    // In H2O to Pascal
+    function toPascal(value) {
+        return Math.round(value); // * 248.84);
+    }
+
+    // Celsius to Fahrenheit
+    function toFahrenheit(value) {
+        return Math.round((value * 1.8) + 32.0);
+    }
+
+    // Ajax get to turn the alarm on
+    function alarmOn() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "alarm_on" %}',
+        });
+    }
+
+    // Ajax get to turn the alarm off
+    function alarmOff() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "alarm_off" %}',
+        });
+    }
+
+    // Toggle pressure room type
+    function showPressRoom(room_type) {
+        if (room_type == "positive") {
+            $("#pressNegativeValues").hide();
+            $("#pressPositiveValues").show();
+            $('#id_negative_room').val("false");
+        } else {
+            $("#pressPositiveValues").hide();
+            $("#pressNegativeValues").show();
+            $('#id_negative_room').val("true");
+        }
+    }
+
+    function surpressAlarms() {
+        alarmOff();
+        alarm_surpressed.push.apply(alarm_surpressed, running_alarm);
+        running_alarm = [];
+        $("#alarmBtn").css("visibility", "hidden");
+    }
+
+    // Generate json with sensor config to send via post to views
+    function gatherSensorConfiguration(sensor_type) {
+        var modalClass = ".configure-" + sensor_type;
+
+        var config = {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            sensor_type: $(modalClass + ' #id_sensor_type').val(),
+            low_alarm: $(modalClass + ' #id_low_alarm').val(),
+            low_warning: $(modalClass + ' #id_low_warning').val(),
+            high_warning: $(modalClass + ' #id_high_warning').val(),
+            high_alarm: $(modalClass + ' #id_high_alarm').val(),
+            delay: $(modalClass + ' #id_delay').val(),
+            alarm_active: $(modalClass + ' #id_alarm_active_' + sensor_type).prop("checked"),
+        }
+
+        return gatherComplexSensorConfig(config, sensor_type, modalClass);
+    }
+
+    // Add in selected unit and press sensor config if necessary
+    function gatherComplexSensorConfig(config, sensor_type, modalClass) {
+        if (sensor_type == "flow") {
+            config["metric"] = $(modalClass + ' #id_metric').val();
+        } else if (sensor_type == "temp") {
+            config["celsius"] = $(modalClass + ' #id_celsius').val();
+        } else if (sensor_type == "press") {
+            config["in_h2o"] = $(modalClass + ' #id_in_h2o').val();
+            config["low_alarm_neg"] = $(modalClass + ' #id_low_alarm_neg').val();
+            config["low_warning_neg"] = $(modalClass + ' #id_low_warning_neg').val();
+            config["high_warning_neg"] = $(modalClass + ' #id_high_warning_neg').val();
+            config["high_alarm_neg"] = $(modalClass + ' #id_high_alarm_neg').val();
+            config["negative_room"] = $(modalClass + ' #id_negative_room').val();
+        }
+        return config;
+    }
+    // Ajax to turn speed 
+    function speedOff() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "Speed0" %}',
+            success: function() {
+                $('.speedTitle').text('SPEED OFF');
+            }
+        });
+    }
+    // Ajax to turn speed 
+    function Speed1() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "Speed1" %}',
+            success: function() {
+                $('.speedTitle').text('SPEED 1');
+            }
+        });
+    }
+    // Ajax to turn speed 
+    function Speed2() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "Speed2" %}',
+            success: function() {
+                $('.speedTitle').text('SPEED 2');
+            }
+        });
+    }
+    // Ajax to turn speed 
+    function Speed3() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "Speed3" %}',
+            success: function() {
+                $('.speedTitle').text('SPEED 3');
+            }
+        });
+    }
+    // Ajax to turn speed 
+    function Speed4() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "Speed4" %}',
+            success: function() {
+                $('.speedTitle').text('SPEED 4');
+            }
+        });
+    }
+
+    function datastring() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "datastring" %}',
+            success: function(data) {
+                JSON.stringify(data);
+                var x = JSON.stringify(data).split('*');
+                $(".helpLifeTitle").text(x[2].substr(2));
+                //$(".helpLife").text(x[2].substr(6));
+                //alert('done' + data.data + "dataF" + x[2].substr(6))
+            }
+        });
+    }
+    // Ajax to turn UV ON 
+    function uvOn() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "uvOn" %}',
+            success: function() {
+                $('.uvOnOff').text('ON');
+            }
+        });
+    }
+
+    function hepaLifeReset() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "hepaLifeReset" %}',
+            success: function(data) {
+                alert(JSON.stringify(data));
+                var hepa = JSON.stringify(data).split('*');
+                $('.helpLifeTitle').text(hepa[0].substring(9));
+            }
+        });
+    }
+
+
+    function uvOff() {
+        $.ajax({
+            type: "GET",
+            url: '{% url "uvOff" %}',
+            success: function() {
+                $('.uvOnOff').text('OFF');
+            }
+        });
+    }
+    $(document).ready(function() {
+
+        // Configure sensors on load once so that the alarm tresholds are available
+        // and all are connected to a POST handler
+        for (var i = 0; i < sensor_types.length; i++) {
+            configureSensor(sensor_types[i]);
+            attachSubmitHandler(sensor_types[i], "/main/update_sensor", gatherSensorConfiguration);
+        }
+
+        // Initialize alarmBtn
+        $("#alarmBtn").css("border-color", "red");
+        $("#alarmBtn").css("visibility", "hidden");
+
+        // Load initial sensor data
+        getSensorData();
+        configureAchsetup();
+
+        $('.datastring').click(function() {
+            datastring();
+        });
+        $('.speedOff').click(function() {
+
+            speedOff();
+        });
+
+        $('.speedF').click(function() {
+
+            Speed1();
+        });
+        $('.speedS').click(function() {
+
+            Speed2();
+        });
+        $('.speedT').click(function() {
+
+            Speed3();
+        });
+        $('.speedFo').click(function() {
+
+            Speed4();
+        });
+        $('.uvOn').click(function() {
+
+            uvOn();
+        });
+        $('.uvOff').click(function() {
+
+            uvOff();
+        });
+        $('.hepaLifeReset').click(function() {
+
+            hepaLifeReset();
+        });
+
+
+    });
+
+</script>
+
+{% endblock %}
+{% block content %}
+<!-- analog sensor is ready, only displays readings -->
+<!-- could be a loop probably -->
+{% include "modals/sensors/temp_sensor.html" with name="temp" header="TEMPERATURE ALARM POINTS" form=temp_sensor_form hidden="sensor_type" %}
+{% include "modals/sensors/hum_sensor.html" with name="hum" header="HUMIDITY ALARM POINTS" form=hum_sensor_form hidden="sensor_type" %}
+{% include "modals/sensors/part_sensor.html" with name="part" header="PARTICLES ALARM POINTS" form=part_sensor_form hidden="sensor_type" %}
+{% include "modals/sensors/flow_sensor.html" with name="flow" header="AIRFLOW ALARM POINTS" form=flow_sensor_form hidden="sensor_type" %}
+{% include "modals/sensors/press_sensor.html" with name="press" header="PRESSURE ALARM POINTS" form=press_sensor_form hidden="sensor_type" %}
+<br>
+<div>
+
+    <!-- <center><h4 id="page_title">{{ config.active_profile.title }}</h4></center><br>-->
+    <div class="row text-center">
+        <!-- could be shortened with a template -->
+        <div class="col-md-1" style="width: 12.499999995%;
+    flex: 0 0 12.499%;max-width: 12.499%;"></div>
+        <div class="col-md-3  ">
+            <button type="button" id="pressBtn" class="btn btn-primary btn-circle custom-btn btn-l" data-toggle="modal" data-target="#configurePressModal" onclick="configureSensor('press');"><img class="imgBg" src="/static/IconPressSmallWhite.png"><i class=""><SMALL class="blockSpan">DP <span id="pressure">.</span></small></i></button>
+        </div>
+        <div class="col-md-3 text-center ">
+            <center>
+                <h4 id="page_title">{{ config.active_profile.title }}</h4>
+            </center><br><button type="button" id="alarmBtn" class="btn btn-danger btn-lg" onclick="surpressAlarms();"><img class="imgBg" src="/static/MuteIcon.png"></button>
+        </div>
+        <div class="col-md-3">
+            <button type="button" id="flowBtn" class="btn btn-primary btn-circle custom-btn  btn-l" data-toggle="modal" data-target="#configureFlowModal" onclick="configureSensor('flow');"><img class="imgBg" src="/static/IconACHSmallWhite.png"><i class=""><SMALL class="blockSpan">ACH <span id="airflow">.</span></SMALL></i></button>
+        </div>
+        <div class="col-md-1" style="width: 12.499999995%;
+    flex: 0 0 12.499%;max-width: 12.499%;"></div>
+    </div>
+    <!--  <div class="row text-center">
+      <div class="col-md-1 offset-md-5" id="alarmDiv">
+         <button type="button" id="alarmBtn" class="btn btn-danger btn-lg" onclick="surpressAlarms();"><i class="fas fa-bell"></i></button>
+      </div>
+   </div> -->
+    <div class="row text-center">
+        <button type="button" class="btn btn-danger custom-btn hiddenBtn" onclick="configureAchsetup();">ACH Setup</button>
+        <div class="col-md-3">
+            <button type="button" id="" class="btn btn-primary btn-circle custom-btn btn-l"><img class="" src="/static/IconAirFlowSmallWhite.png"><SMALL class="blockSpan">CFM <span id="CFMval">.</span></SMALL> </button>
+        </div>
+        <!-- <div class="col-md-3">
+            <button type="button" id="analogBtn" class="btn btn-primary btn-circle custom-btn btn-l"><i class=""><SMALL class="blockSpan">PPM <span id="analog">.</span></SMALL></i> </button>
+        </div> -->
+        <div class="col-md-3">
+            <button type="button" id="humBtn" class="btn btn-primary btn-circle custom-btn btn-l" data-toggle="modal" data-target="#configureHumModal" onclick="configureSensor('hum');"><img class="" src="/static/IconHumiditySmallWhite.png"><i class=""><SMALL class="blockSpan">RH <span id="humidity">.</span></SMALL></i></button>
+        </div>
+        <div class="col-md-3">
+            <button type="button" id="tempBtn" class="btn btn-primary btn-circle custom-btn btn-l" data-toggle="modal" data-target="#configureTempModal" onclick="configureSensor('temp');"><img class="" src="/static/IconTempSmallWhite.png"><SMALL class="blockSpan">TEMP <span id="temperature">.</span></SMALL></i> </button>
+        </div>
+
+        <div class="col-md-3">
+            <button type="button" id="partBtn" class="btn btn-primary btn-circle custom-btn btn-l" data-toggle="modal" data-target="#configurePartModal" onclick="configureSensor('part');"><img class="" src="/static/IconPPMSmallWhite.png"><i class=""><SMALL class="blockSpan"> <span id="particles">.</span>PM</SMALL></i><SMALL class="blockSpan">2.5 um/m<sup>3</sup></SMALL></button>
+        </div>
+    </div>
+</div>
+
+
+<!-- WHY isn't this loaded from style.css??? Because of extending or including, the 
+styles from style.css are not available when this page loads -->
+<!-- Styles for the sensor circle buttons -->
+<style type="text/css" media="screen">
+    html {
+        position: relative;
+        min-height: 100%;
+        touch-action: none;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .blockSpan {
+        display: block;
+    }
+
+    .hiddenBtn {
+        display: none;
+    }
+
+    .footer {
+        background-color: #3c4874 !important;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        /* Set the fixed height of the footer here */
+        height: 60px;
+        line-height: 60px;
+        /* Vertically center the text there */
+        background-color: #f5f5f5;
+    }
+
+
+    /* Custom page CSS
+-------------------------------------------------- */
+    /* Not required for template or sticky footer method. */
+
+    body>.container {
+        padding: 60px 15px 0;
+    }
+
+    .whiteText {
+        color: rgb(255, 255, 255) !important;
+    }
+
+    .footer>.container {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+
+    code {
+        font-size: 80%;
+    }
+
+    .btn-primary,
+    .btn-primary:hover,
+    .btn-primary:active,
+    .btn-primary:visited {
+        background-color: #3c4874 !important;
+    }
+
+    body {
+        /* Margin bottom by footer height */
+        overflow-y: hidden;
+        max-width: 100%;
+        overflow-x: hidden;
+        margin-bottom: 60px;
+
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    .btn-circle.btn-l {
+        width: 170px;
+        height: 170px;
+        padding: 20px 16px;
+        border-radius: 85px;
+        font-size: 24px;
+        line-height: 1.33;
+    }
+
+    .btn-circle.btn-md {
+        width: 140px;
+        height: 140px;
+        padding: 20px 16px;
+        border-radius: 70px;
+        font-size: 24px;
+        line-height: 1.33;
+        border: 15px solid;
+    }
+
+    .btn-circle.btn-xl {
+        width: 210px;
+        height: 210px;
+        padding: 20px 16px;
+        border-radius: 105px;
+        font-size: 24px;
+        line-height: 1.33;
+    }
+
+    .btn-circle {
+        width: 30px;
+        height: 30px;
+        padding: 6px 0px;
+        border-radius: 15px;
+        border: 5px solid #449d44;
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.42857;
+    }
+
+</style>
+{% endblock %}

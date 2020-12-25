@@ -1,0 +1,134 @@
+<header>
+    <nav class="navbar navbar-expand-md navbar-light  fixed-top bg-company-red" id="navbar_main">
+        <a class="navbar-brand  py-0" href="#"><img src="/static/Abatement_Logo-White.png" alt=""></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <!-- rooms -->
+                {% for index in '12'|make_list %}
+                <span class="py-0" id="menu_room_{{index}}">
+                    <li class="nav-item dropdown active">
+                        <a class="nav-link dropdown-toggle py-0 WT" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Room{{index}}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <button type="button" class="dropdown-item AchBtn" data-toggle="modal" data-target="#configureAchsetupModal" onclick="configureAchsetup();">ACH Setup</button>
+                            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configureAchcalibrationModal" onclick="configureAchCalibration();">ACH Calibration</button>
+                            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configurePressurecalibrationModal" id="confiPress">Pressure Calibration</button>
+                            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configureProfileModal" onclick="configureProfileSetup('{{index}}');">Profile Setup</button>
+                        </div>
+                    </li>
+                </span>
+                <span id="link_room_{{index}}" style="display: none;">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle py-0" aria-haspopup="true" aria-expanded="false" onclick="toggleRoom('{{index}}');">
+                            Room{{index}}</a>
+                    </li>
+                </span>
+                {% endfor %}
+                <li class="nav-item dropdown">
+
+                    <div class="dropdown show">
+                        <a class="nav-link dropdown-toggle py-0 profileVal" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Profile {{config.active_profile.profile_index}}
+                        </a>
+
+                        <div id="testid" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            {% for index in '12345'|make_list %}
+                            {% if index == '1' %} <a class="dropdown-item py-0" id="profile_link_{{index}}" href="#" onclick="toggleProfile('{{index}}')">OCCUPIED POSITIVE <span style="display:none">{{index}} </span></a> {% endif %}
+                            {% if index == '2' %} <a class="dropdown-item py-0" id="profile_link_{{index}}" href="#" onclick="toggleProfile('{{index}}')">OCCUPIED NEGATIVE <span style="display:none">{{index}} </span></a> {% endif %}
+                            {% if index == '3' %} <a class="dropdown-item py-0" id="profile_link_{{index}}" href="#" onclick="toggleProfile('{{index}}')">SURGERY <span style="display:none">{{index}} </span></a> {% endif %}
+                            {% if index == '4' %} <a class="dropdown-item py-0" id="profile_link_{{index}}" href="#" onclick="toggleProfile('{{index}}')">NEED CLEANING <span style="display:none">{{index}} </span></a> {% endif %}
+                            {% if index == '5' %} <a class="dropdown-item py-0" id="profile_link_{{index}}" href="#" onclick="toggleProfile('{{index}}')">UNOCCUPIED <span style="display:none">{{index}} </span></a> {% endif %}
+                            {# <a class="dropdown-item py-0" id="profile_link_{{index}}" href="#" onclick="toggleProfile('{{index}}')">OCCUPIED <span style="display:none">{{index}} </span></a> #}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-inline mt-2 mt-md-0">
+                <div class="dropdown dropleft">
+                    <button type="button" class="btn btn-priamry btn-cutsom dropdown-toggle py-0" data-toggle="dropdown"><img src="/static/ButtonSettingsWhiteSmall.png"></button>
+                    <div class="dropdown-menu py-0">
+                        <h5 class="dropdown-header py-0">SETTINGS</h5>
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configureDisplayModal" onclick="configureDisplay();">DISPLAY</button>
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configureSoundModal" onclick="configureSound();">SOUNDS</button>
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configureClockModal">TIME/DATE</button>
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#configureFeaturesModal" onclick="configureFeatures();">FEATURES</button>
+                        <a class="dropdown-item" href='{% url "view_data" %}'>DATA</a>
+                        <a class="dropdown-item" data-target="#configurecommModal" data-toggle="modal">COMM</a>
+                        <a class="dropdown-item" href="{% url 'view_password' %}">PASSWORD</a>
+                        <a class="dropdown-item" data-target="#configuresystemModal" data-toggle="modal">SYSTEM</a>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-priamry btn-cutsom py-0" data-toggle="modal" data-target="#configureNetworkModal" onclick="configureNetwork();"><img class="imgBg" src="/static/WifiGreen.png"></button>
+                <!-- <a class="navbar-brand" class ="py-0" href="#">
+          <img src="/static/BoxWaveLogoSmallWhite.png" alt="">
+        </a> -->
+            </form>
+        </div>
+    </nav>
+</header>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="btn-group dropup col-md-3">
+                <button type="button" class="btn btn-primary custom-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class='speedTitle'></span>
+                </button>
+                <div class="dropdown-menu">
+                    <!--<form class="px-4">
+                    <form action='/main/Speed0' method='GET'>-->
+                    <div class="form-group row">
+                        <button class="btn btn-primary btn-sm speedOff" onclick="speedOff();">OFF</button>
+                    </div>
+                    <div class="form-group row">
+                        <button class="btn btn-primary btn-sm speedF" onclick="Speed1();">SPEED 1</button>
+                    </div>
+                    <div class="form-group row">
+                        <button class="btn btn-primary btn-sm speedS" onclick="Speed2();">SPEED 2</button>
+                    </div>
+                    <div class="form-group row">
+                        <button class="btn btn-primary btn-sm speedT" onclick="Speed3();">SPEED 3</button>
+                    </div>
+                    <div class="form-group row">
+                        <button type="submit" class="btn btn-primary btn-sm speedFo" onclick="Speed4();">SPEED 4</button>
+                    </div>
+                    <div class="form-group row">
+                        <button type="submit" class="btn btn-primary btn-sm">AUTO</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="btn-group dropup col-md-3">
+                <button type="button" class="btn btn-primary custom-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    HEPA <span class="helpLifeTitle"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <button class="btn btn-success hepaLifeReset" onclick="hepaLifeReset();">RESET</button>
+                </div>
+            </div>
+
+            <div class="btn-group dropup col-md-3">
+                <button type="button" class="btn btn-primary custom-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    FILTER 100%
+                </button>
+                <div class="dropdown-menu">
+                    <button class="btn btn-success datastring" onclick="datastring();">RESET</button>
+                </div>
+            </div>
+            <div class="btn-group dropup col-md-3">
+                <button type="button" class="btn btn-primary custom-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    UV <span class='uvOnOff'></span>
+                </button>
+                <div class="dropdown-menu">
+                    <button class="btn btn-secondary uvOn" onclick="uvOn();">ON</button>
+                    <button class="btn btn-success  uvOff" onclick="uvOff();">OFF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

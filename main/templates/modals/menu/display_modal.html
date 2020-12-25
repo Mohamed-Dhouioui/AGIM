@@ -1,0 +1,37 @@
+{% extends 'modal_base.html' %}
+{% load widget_tweaks %}
+{% block modal_content %}
+    <div class="row form-group">
+       <div class="col-sm-3 ">
+          <label>SCREEN SLEEP</label>
+       </div>
+       <div class="col-sm-3 ">
+          <button type="button" class="btn btn-success" id="sleepEnable" onclick="toggleModalParameter('display', 'sleep', true);">ON</button>
+       </div>
+       <div class="col-sm-3 ">
+          <button type="button" class="btn btn-secondary" id="sleepDisable" onclick="toggleModalParameter('display', 'sleep', false);">OFF</button>
+       </div>
+    </div>
+    <div class="row form-group">
+       <div class="col-sm-3 ">
+          <label for="email">SCREEN TIME OUT:</label>
+       </div>
+       <div class="col-sm-3">
+          {{display_form.off_time|add_class:"form-control"}}
+       </div>
+       <div class="col-sm-3 ">
+          <label for="email">{{ config.display.off_time }} Sec.</label>
+       </div>
+    </div>
+    <div class="row form-group">
+       <div class="col-sm-3 ">
+          <label for="email">AUTO LOCK:</label>
+       </div>
+       <div class="col-sm-3">
+          {{display_form.lock_time|add_class:"form-control"}}
+       </div>
+       <div class="col-sm-3 ">
+          <label for="email">{{ config.display.lock_time }} Sec.</label>
+       </div>
+    </div>
+{% endblock %}
