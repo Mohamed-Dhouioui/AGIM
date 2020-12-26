@@ -739,7 +739,8 @@ def get_comm_json(request):
     try:
         """ Return comm configuration as JSON. """
         print('\n\n=============================================>\n\n')
-        comm = Comm.objects.get()
+        if request.method == 'GET':
+            comm = get_object_or_404(Comm)
         print('======================================================>')
         return JsonResponse({
             'bacnet_status': comm.bacnet_status,
@@ -756,7 +757,7 @@ def update_comm(request):
     was set, configure that. """
     try:
         form = CommForm(request.POST, 
-            instance=get_object_or_404(Comm))
+            instance=get_object_or_404())
         print('==================================================================>')
         if form.is_valid():
             form.save()

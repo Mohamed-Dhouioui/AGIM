@@ -45,12 +45,12 @@
         // These colors are considered as bright
         var BRIGHT_COLORS = ["#808080", "#FFFFFF", "#FFFF00", "#FFA500"]
 
-        var menu_types = ['network', 'features', 'display', 'clock', 'sound', 'profile',
+        var menu_types = ['network', 'features', 'comm', 'display', 'clock', 'sound', 'profile',
             'achsetup', 'achcalibration'
         ];
 
         var menu_collectors = [gatherNetworkData, gatherFeaturesData, gatherDisplayData,
-            gatherClockData, gatherSoundData, gatherProfileData, gatherAchsetupData,
+            gatherClockData, gatherSoundData, gatherProfileData, gatherCommData, gatherAchsetupData,
             gatherAchcalibrationData
         ];
 
@@ -283,6 +283,20 @@
             });
         }
 
+
+        function configureComm() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_comm_json" %}',
+                success: function(data) {
+                    toggleModalParameter('comm', 'bacnet_status', data.bacnet_status);
+                    $(".configure-comm #id_baudrate").val(data.baudrate);
+                    $(".configure-comm #id_mac_adress").val(data.mac_adress);
+                    $(".configure-comm #id_object_instance").val(data.object_instance);
+                },
+            });
+        }
+
         // Change the current profile
         function toggleProfile(index) {
             let url = '{% url "toggle_profile" 99999 %}';
@@ -388,6 +402,20 @@
                 screen_sleep: $('#id_screen_sleep').val(),
                 off_time: $('#id_off_time').val(),
                 lock_time: $(' #id_lock_time').val(),
+            }
+
+            return data;
+        }
+
+
+        function gatherCommData(name) {
+            var data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                bacnet_status: $('#id_bacnet_status').val(),
+                baudrate: $('#id_baudrate').val(),
+                mac_adress: $(' #id_mac_adress').val(),
+                object_instance: $(' #id_object_instance').val(),
+
             }
 
             return data;
@@ -690,7 +718,7 @@
     {% include "modals/menu/achsetup_modal.html" with name="achsetup" header="ACH SETUP" form=achsetup_form hidden="round" %}
     {% include "modals/menu/pressurecalibration_modal.html" with name="pressurecalibration" header="PRESSURE CALIBRATION" form=pressurecalibration_form hidden="nothing" %}
     {% include "modals/menu/system_modal.html" with name="system" header="SYSTEM INFORMATION" hidden="nothing" %}
-    {% include "modals/menu/comm_modal.html" with name="comm" header="BACNET SETTINGS" hidden="nothing" %}
+    {% include "modals/menu/comm_modal.html" with name="comm"  header="BACNET SETTINGS" from=comm_form hidden="bacnet_status" %}
     {% include "modals/menu/network_modal.html" with name="network" header="NETWORK SETTINGS" form=network_form hidden="nothing" %}
     {% include "modals/menu/feature_modal.html" with name="features" header="FEATURES ENABLE DISABLE" form=features_form hidden="nothing" %}
     {% include "modals/menu/display_modal.html" with name="display" header="DISPLAY SETTINGS" form=display_form hidden="screen_sleep" %}

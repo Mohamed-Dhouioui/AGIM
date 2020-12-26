@@ -2,8 +2,9 @@
 {% load widget_tweaks %}
 {% block modal_content %}
     <div class="row form-group">
+        <input type="hidden" id="id_bacnet_status" name="bacnet_status"></input>
        <div class="col-sm-3 ">
-          <label>BACNET STATUS</label>
+          <label>bacnet_status</label>
        </div>
        <div class="col-sm-3 ">
           <button type="button" class="btn btn-success" id="bacnet_statusEnable" onclick="toggleModalParameter('comm', 'bacnet_status', true);">ENABLE</button>
@@ -19,9 +20,6 @@
        <div class="col-sm-3">
           {{comm_form.baudrate|add_class:"form-control"}}
        </div>
-       <div class="col-sm-3 ">
-          <label for="email">{{ config.comm.baudrate }} ..</label>
-       </div>
     </div>
     <div class="row form-group">
        <div class="col-sm-3 ">
@@ -29,9 +27,6 @@
        </div>
        <div class="col-sm-3">
           {{comm_form.mac_adress|add_class:"form-control"}}
-       </div>
-       <div class="col-sm-3 ">
-          <label for="email">{{ config.comm.mac_adress }} Sec.</label>
        </div>
     </div>
     <div class="row form-group">
@@ -41,8 +36,6 @@
         <div class="col-sm-3">
            {{comm_form.object_instance|add_class:"form-control"}}
         </div>
-        <div class="col-sm-3 ">
-           <label for="email">{{ config.comm.object_instance }} Sec.</label>
-        </div>
      </div>
 {% endblock %}
+
